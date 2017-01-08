@@ -620,6 +620,23 @@ func (s *RepositoriesService) GetBranchProtection(owner, repo, branch string) (*
 	return p, resp, err
 }
 
+//GetProtectionRequest provides the ProtectionRequest struct to the caller
+func (s *RepositoriesService) GetProtectionRequest() *ProtectionRequest {
+	//TODO: Default values to be set, not thought about it yet
+	input := &ProtectionRequest{
+		RequiredStatusChecks: &RequiredStatusChecks{
+			IncludeAdmins: Bool(true),
+			Strict:        Bool(true),
+			Contexts:      &[]string{"continuous-integration"},
+		},
+		Restrictions: &BranchRestrictionsRequest{
+			Users: &[]string{"u"},
+			Teams: &[]string{"t"},
+		},
+	}
+	return input
+}
+
 // UpdateBranchProtection updates the protection of a given branch.
 //
 // GitHub API docs: https://developer.github.com/v3/repos/branches/#update-branch-protection
