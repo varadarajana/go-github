@@ -12,7 +12,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/google/go-github/github"
+	"go-github/github"
 )
 
 func TestRepositories_CRUD(t *testing.T) {
@@ -114,30 +114,35 @@ func TestRepositories_EditBranches(t *testing.T) {
 		t.Fatalf("Repositories.GetBranch() returned error: %v", err)
 	}
 
-	if *branch.Protection.Enabled {
+	if *branch.Protected {
 		t.Fatalf("Branch %v of repo %v is already protected", "master", *repo.Name)
 	}
 
-	branch.Protection.Enabled = github.Bool(true)
-	branch.Protection.RequiredStatusChecks = &github.RequiredStatusChecks{
-		EnforcementLevel: github.String("everyone"),
-		Contexts:         &[]string{"continous-integration"},
-	}
-	branch, _, err = client.Repositories.EditBranch(*repo.Owner.Login, *repo.Name, "master", branch)
+	branch.Protected = github.Bool(true)
+
+	protectionRequest := client.Repositories.GetProtectionRequest()
+
+	protectionRequest.RequiredStatusChecks.IncludeAdmins = github.Bool(true)
+	protectionRequest.RequiredStatusChecks.Strict = github.Bool(true)
+	protectionRequest.RequiredStatusChecks.Contexts = &[]string{"continuous-integration"}
+	protectionRequest.Restrictions.Users = &[]string{"u"}
+	protectionRequest.Restrictions.Teams = &[]string{"t"}
+
+	protection, _, err := client.Repositories.UpdateBranchProtection("o", "r", "b", protectionRequest)
 	if err != nil {
 		t.Fatalf("Repositories.EditBranch() returned error: %v", err)
 	}
 
-	if !*branch.Protection.Enabled {
+	if !*protection.RequiredStatusChecks.IncludeAdmins {
 		t.Fatalf("Branch %v of repo %v should be protected, but is not!", "master", *repo.Name)
 	}
-	if *branch.Protection.RequiredStatusChecks.EnforcementLevel != "everyone" {
-		t.Fatalf("RequiredStatusChecks should be enabled for everyone, set for: %v", *branch.Protection.RequiredStatusChecks.EnforcementLevel)
-	}
+	//if *protection.RequiredStatusChecks.IncludeAdmins != "everyone" {
+	//	t.Fatalf("RequiredStatusChecks should be enabled for everyone, set for: %v", *protection.RequiredStatusChecks.EnforcementLevel)
+	//}
 
 	wantedContexts := []string{"continous-integration"}
-	if !reflect.DeepEqual(*branch.Protection.RequiredStatusChecks.Contexts, wantedContexts) {
-		t.Fatalf("RequiredStatusChecks.Contexts should be: %v but is: %v", wantedContexts, *branch.Protection.RequiredStatusChecks.Contexts)
+	if !reflect.DeepEqual(*protection.RequiredStatusChecks.Contexts, wantedContexts) {
+		t.Fatalf("RequiredStatusChecks.Contexts should be: %v but is: %v", wantedContexts, *protection.RequiredStatusChecks.Contexts)
 	}
 
 	_, err = client.Repositories.Delete(*repo.Owner.Login, *repo.Name)
