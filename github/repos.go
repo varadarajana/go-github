@@ -608,7 +608,7 @@ func (s *RepositoriesService) GetBranchProtection(owner, repo, branch string) (*
 		return nil, nil, err
 	}
 
-	// TODO: remove custom Accept header when this API fully launches
+	// TODO: remove custom Accept header when this API fully launches.
 	req.Header.Set("Accept", mediaTypeProtectedBranchesPreview)
 
 	p := new(Protection)
