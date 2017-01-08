@@ -10,7 +10,7 @@ package tests
 import (
 	"testing"
 
-	"go-github/github"
+	"github.com/google/go-github/github"
 )
 
 const (
