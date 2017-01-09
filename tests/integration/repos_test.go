@@ -120,15 +120,32 @@ func TestRepositories_EditBranches(t *testing.T) {
 
 	branch.Protected = github.Bool(true)
 
-	protectionRequest := client.Repositories.GetProtectionRequest()
 
-	protectionRequest.RequiredStatusChecks.IncludeAdmins = github.Bool(true)
-	protectionRequest.RequiredStatusChecks.Strict = github.Bool(true)
-	protectionRequest.RequiredStatusChecks.Contexts = &[]string{"continuous-integration"}
-	protectionRequest.Restrictions.Users = &[]string{"u"}
-	protectionRequest.Restrictions.Teams = &[]string{"t"}
 
-	protection, _, err := client.Repositories.UpdateBranchProtection("o", "r", "b", protectionRequest)
+
+	input := &github.ProtectionRequest{
+		RequiredStatusChecks: &github.RequiredStatusChecks{
+			IncludeAdmins: github.Bool(true),
+			Strict:        github.Bool(true),
+			Contexts:      &[]string{"continuous-integration"},
+		},
+		Restrictions: &github.BranchRestrictionsRequest{
+			Users: &[]string{"u"},
+			Teams: &[]string{"t"},
+		},
+	}
+
+
+
+	//protectionRequest := client.Repositories.GetProtectionRequest()
+
+	//protectionRequest.RequiredStatusChecks.IncludeAdmins = github.Bool(true)
+	//protectionRequest.RequiredStatusChecks.Strict = github.Bool(true)
+	//protectionRequest.RequiredStatusChecks.Contexts = &[]string{"continuous-integration"}
+	//protectionRequest.Restrictions.Users = &[]string{"u"}
+	//protectionRequest.Restrictions.Teams = &[]string{"t"}
+
+	protection, _, err := client.Repositories.UpdateBranchProtection("o", "r", "b", input)
 	if err != nil {
 		t.Fatalf("Repositories.EditBranch() returned error: %v", err)
 	}
