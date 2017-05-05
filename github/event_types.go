@@ -323,6 +323,17 @@ type OrganizationEvent struct {
 	Installation *Installation `json:"installation,omitempty"`
 }
 
+// OrgBlockEvent is triggered when an organization blocks or unblocks a user.
+// The Webhook event name is "org_block".
+//
+// GitHub API docs: https://developer.github.com/v3/activity/events/types/#orgblockevent
+type OrgBlockEvent struct {
+	Action       *string       `json:"action,omitempty"`
+	BlockedUser  *User         `json:"blocked_user,omitempty"`
+	Organization *Organization `json:"organization,omitempty"`
+	Sender       *User         `json:"sender,omitempty"`
+}
+
 // PageBuildEvent represents an attempted build of a GitHub Pages site, whether
 // successful or not.
 // The Webhook event name is "page_build".
