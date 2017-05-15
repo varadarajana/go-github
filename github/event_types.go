@@ -328,10 +328,15 @@ type OrganizationEvent struct {
 //
 // GitHub API docs: https://developer.github.com/v3/activity/events/types/#orgblockevent
 type OrgBlockEvent struct {
+	// Action is the action that was performed.
+	// Can be "blocked" or "unblocked".
 	Action       *string       `json:"action,omitempty"`
 	BlockedUser  *User         `json:"blocked_user,omitempty"`
 	Organization *Organization `json:"organization,omitempty"`
 	Sender       *User         `json:"sender,omitempty"`
+
+	// The following fields are only populated by Webhook events.
+	Installation *Installation `json:"installation,omitempty"`
 }
 
 // PageBuildEvent represents an attempted build of a GitHub Pages site, whether
